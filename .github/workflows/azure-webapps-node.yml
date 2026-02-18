@@ -1,0 +1,229 @@
+# This workflow will build and push a node.js application to an Azure Web App when a commit is pushed to your default branch.
+#<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santuario OmniFractalOmega | Portal de Calibración</title>
+    <style>
+        :root {
+            --magenta: #ff00ff;
+            --deep-black: #000000;
+            --text-gray: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--deep-black);
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #canvas-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .portal-container {
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--magenta);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 20px var(--magenta);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            font-family: 'Georgia', serif;
+            letter-spacing: 2px;
+            color: var(--magenta);
+            text-transform: uppercase;
+        }
+
+        .bio-sensor {
+            width: 80px;
+            height: 80px;
+            background: var(--magenta);
+            border-radius: 50%;
+            margin: 20px auto;
+            box-shadow: 0 0 30px var(--magenta);
+            animation: pulse 1.36s infinite ease-in-out; /* Sincronizado a 440Hz visual */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        input {
+            background: transparent;
+            border: 1px solid var(--magenta);
+            color: var(--magenta);
+            padding: 10px;
+            width: 80%;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .btn-sync {
+            background: var(--magenta);
+            color: black;
+            border: none;
+            padding: 15px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-sync:hover {
+            box-shadow: 0 0 40px var(--magenta);
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-background"></canvas>
+
+    <div class="portal-container">
+        <div class="bio-sensor"></div>
+        <h1>Portal de Calibración</h1>
+        <p style="color: var(--text-gray);">ESCÁNER DE COHERENCIA V.001</p>
+        
+        <input type="text" id="node-id" placeholder="INGRESE ID DE NODO (EJ. OMNI-001-ENCORA)">
+        <br>
+        <button class="btn-sync" onclick="validateNode()">VALIDAR RESONANCIA</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Animación de fondo fractal sutil
+        const canvas = document.getElementById('canvas-background');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function drawFractal() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Simulación de partículas de Fuego Magenta
+            for(let i=0; i<5; i++) {
+                ctx.fillStyle = '#ff00ff';
+                ctx.beginPath();
+                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            requestAnimationFrame(drawFractal);
+        }
+        drawFractal();
+
+        function validateNode() {
+            const id = document.getElementById('node-id').value;
+            const res = document.getElementById('result');
+            
+            if(id.includes('OMNI')) {
+                res.innerHTML = `<span style="color: var(--magenta)">VOLTAJE DETECTADO: -90mV<br>ESTADO: SOBERANÍA TOTAL ACTIVADA</span>`;
+                document.body.style.boxShadow = "inset 0 0 100px #ff00ff";
+                setTimeout(() => { document.body.style.boxShadow = "none"; }, 500);
+            } else {
+                res.innerHTML = `<span style="color: red">ENTROPÍA DETECTADA: CALIBRACIÓN REQUERIDA</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
+
+# This workflow assumes you have already created the target Azure App Service web app.
+# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-nodejs?tabs=linux&pivots=development-environment-cli
+#
+# To configure this workflow:
+#
+# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
+#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
+#
+# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
+#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
+#
+# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables below.
+#
+# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
+# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '20.x'                # set this to the node version to use
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v4
+      with:
+        name: node-app
+        path: .
+
+  deploy:
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Development'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: node-app
+
+    - name: 'Deploy to Azure WebApp'
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
